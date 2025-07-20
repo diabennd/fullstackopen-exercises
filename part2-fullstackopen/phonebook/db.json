@@ -19,6 +19,16 @@
       "name": "Mary Poppendieck",
       "number": "39-23-6423122",
       "id": "4"
+    },
+    {
+      "id": "5",
+      "name": "William Arthur",
+      "number": "08155051500"
+    },
+    {
+      "name": "Arthur Way",
+      "number": "1122039123",
+      "id": "6"
     }
   ]
 }
