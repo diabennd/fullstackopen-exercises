@@ -1,0 +1,8 @@
+.error {
+    color: seagreen;
+    padding: 20px;
+    font-weight: 700;
+    border: 3px solid green;
+    border-radius: 10px;
+    background-color: palegreen;
+}

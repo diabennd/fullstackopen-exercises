@@ -3,6 +3,7 @@ import service from "./services/service";
 import Persons from "./components/Persons";
 import PersonForm from "./components/PersonForm";
 import Filter from "./components/Filter";
+import Notification from "./components/Notification";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -10,6 +11,8 @@ const App = () => {
   const [newNumber, setNewNumber] = useState("");
   const [reloadData, setReloadData] = useState(false);
   const [filter, setFilter] = useState("");
+  const [notification, setNotification] = useState(false);
+  const [message, setMessage] = useState(null);
 
   useEffect(() => {
     service.getAllData().then((res) => {
@@ -18,6 +21,15 @@ const App = () => {
       setReloadData(false);
     });
   }, [reloadData]);
+
+  const showNotification = (content, info) => {
+    setNotification(true);
+    setMessage(`${info} ${content}`);
+    setTimeout(() => {
+      setNotification(false);
+      setMessage(null);
+    }, 2000);
+  };
 
   const handleSubmitPerson = (e) => {
     e.preventDefault();
@@ -29,11 +41,10 @@ const App = () => {
     };
 
     const addPerson = (content) => {
-      const data = service.addData(content).then((res) => {
+      service.addData(content).then((res) => {
         console.log(res);
         return res;
       });
-      console.log("success add: ", data);
     };
 
     const editPersonNumber = (id, content) => {
@@ -47,9 +58,9 @@ const App = () => {
     // console.log(duplicatePerson);
 
     if (duplicatePerson === undefined) {
-      // setPersons([...persons, newPerson]);
       addPerson(newPerson);
       setReloadData(true);
+      showNotification(newPerson.name, "Added");
     } else {
       if (
         window.confirm(
@@ -58,19 +69,18 @@ const App = () => {
       ) {
         editPersonNumber(duplicatePerson.id, newPerson);
         setReloadData(true);
+        showNotification(duplicatePerson.name, "Change");
       }
     }
     setNewName("");
     setNewNumber("");
   };
 
-  // console.log("render", persons);
-
   const handleDeletePerson = (id, content) => {
     const deleteData = () => {
       if (window.confirm(`Delete ${content} ?`)) {
         service.deleteData(id).then((res) => res);
-        // console.log("after delete", persons);
+        showNotification(content, "Removed");
       } else {
         setPersons(persons);
       }
@@ -98,6 +108,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      {notification ? <Notification message={message} /> : null}
       <Filter handleFilterShown={handleFilterShown} />
       <h2>Add New</h2>
       <PersonForm
