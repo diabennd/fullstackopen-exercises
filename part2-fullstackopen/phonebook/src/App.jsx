@@ -10,7 +10,6 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [filter, setFilter] = useState("");
-  const [notification, setNotification] = useState(false);
   const [info, setInfo] = useState("info");
   const [message, setMessage] = useState(null);
 
@@ -21,10 +20,8 @@ const App = () => {
   }, []);
 
   const showNotification = (content, info) => {
-    setNotification(true);
     setMessage(`${info} ${content}`);
     setTimeout(() => {
-      setNotification(false);
       setMessage(null);
     }, 2000);
   };
