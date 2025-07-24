@@ -1,7 +1,8 @@
-const Notification = ({ message }) => {
+const Notification = ({ message, info }) => {
+  if (message === null) return null;
   return (
     <>
-      <h3 className="error">{message}</h3>
+      <h3 className={info}>{message}</h3>
     </>
   );
 };

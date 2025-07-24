@@ -11,11 +11,11 @@ const App = () => {
   const [newNumber, setNewNumber] = useState("");
   const [filter, setFilter] = useState("");
   const [notification, setNotification] = useState(false);
+  const [info, setInfo] = useState("info");
   const [message, setMessage] = useState(null);
 
   useEffect(() => {
     service.getAllData().then((res) => {
-      console.log(res);
       setPersons(res);
     });
   }, []);
@@ -39,7 +39,6 @@ const App = () => {
     };
 
     const duplicatePerson = persons.find((person) => person.name === newName);
-    console.log(duplicatePerson);
 
     if (duplicatePerson === undefined) {
       service
@@ -61,11 +60,16 @@ const App = () => {
         service
           .editData(duplicatePerson.id, changedNumber)
           .then((changedNumberData) => {
-            console.log("halo");
             setPersons(persons.concat(changedNumberData));
           })
-          .catch((error) => {
-            console.log(error);
+          .catch(() => {
+            setMessage(
+              `Information of ${duplicatePerson.name} has been removed from server`,
+            );
+            setInfo("error");
+            setPersons(
+              persons.filter((person) => person.id !== duplicatePerson.id),
+            );
           });
         showNotification(duplicatePerson.name, "Change");
       }
@@ -109,7 +113,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      {notification ? <Notification message={message} /> : null}
+      <Notification message={message} info={info} />
       <Filter handleFilterShown={handleFilterShown} />
       <h2>Add New</h2>
       <PersonForm
