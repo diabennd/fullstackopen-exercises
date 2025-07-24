@@ -9,7 +9,6 @@ const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
-  const [reloadData, setReloadData] = useState(false);
   const [filter, setFilter] = useState("");
   const [notification, setNotification] = useState(false);
   const [message, setMessage] = useState(null);
@@ -18,9 +17,8 @@ const App = () => {
     service.getAllData().then((res) => {
       console.log(res);
       setPersons(res);
-      setReloadData(false);
     });
-  }, [reloadData]);
+  }, []);
 
   const showNotification = (content, info) => {
     setNotification(true);
@@ -40,26 +38,18 @@ const App = () => {
       id: String(persons.length + 1),
     };
 
-    const addPerson = (content) => {
-      service.addData(content).then((res) => {
-        console.log(res);
-        return res;
-      });
-    };
-
-    const editPersonNumber = (id, content) => {
-      service.editData(id, content).then((res) => {
-        console.log(res);
-        return res;
-      });
-    };
-
     const duplicatePerson = persons.find((person) => person.name === newName);
-    // console.log(duplicatePerson);
+    console.log(duplicatePerson);
 
     if (duplicatePerson === undefined) {
-      addPerson(newPerson);
-      setReloadData(true);
+      service
+        .addData(newPerson)
+        .then((returnedPerson) => {
+          setPersons(persons.concat(returnedPerson));
+        })
+        .catch((error) => {
+          console.log(error);
+        });
       showNotification(newPerson.name, "Added");
     } else {
       if (
@@ -67,8 +57,16 @@ const App = () => {
           `${duplicatePerson.name} already exist, edit with new one?`,
         )
       ) {
-        editPersonNumber(duplicatePerson.id, newPerson);
-        setReloadData(true);
+        const changedNumber = { ...duplicatePerson, number: newNumber };
+        service
+          .editData(duplicatePerson.id, changedNumber)
+          .then((changedNumberData) => {
+            console.log("halo");
+            setPersons(persons.concat(changedNumberData));
+          })
+          .catch((error) => {
+            console.log(error);
+          });
         showNotification(duplicatePerson.name, "Change");
       }
     }
@@ -78,15 +76,18 @@ const App = () => {
 
   const handleDeletePerson = (id, content) => {
     const deleteData = () => {
+      const deletedData = persons.filter((person) => person.id !== id);
       if (window.confirm(`Delete ${content} ?`)) {
-        service.deleteData(id).then((res) => res);
-        showNotification(content, "Removed");
+        service.deleteData(id).then((res) => {
+          console.log(res);
+          setPersons(deletedData);
+        });
+        showNotification(content, "Remove");
       } else {
         setPersons(persons);
       }
     };
     deleteData();
-    setReloadData(true);
   };
 
   const handleAddName = (e) => {
